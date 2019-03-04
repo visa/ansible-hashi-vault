@@ -1,0 +1,36 @@
+
+- name: Deploy consul client
+  hosts: vault
+  become: true
+  roles:
+  - { role: consul, dispatch: ['deploy'], consul_mode_is_server: false, enable_firewall_rules: false }  
+
+
+- name: Deploy vault server
+  hosts: vault
+  become: true
+  roles:
+  - { role: vault, dispatch: ['deploy'], enable_firewall_rules: false}
+
+- name: Deploy consul server only
+  hosts: consul
+  become: true
+  roles:
+  - { role: consul, dispatch: ['deploy'], consul_mode_is_server: true, enable_firewall_rules: false }
+
+- name: Create consul cluster of clients and server
+  hosts: vault:consul 
+  roles:
+  - { role: consul, dispatch: ['initialize'], enable_firewall_rules: false }
+
+- name: Initialize vault
+  hosts: vault 
+  become: true
+  roles:
+  - { role: vault, dispatch: ['initialize'], enable_firewall_rules: false }
+
+- name: Run vault
+  hosts: vault 
+  become: true
+  roles:
+  - { role: vault, dispatch: ['running'], enable_firewall_rules: false }

@@ -1,0 +1,11 @@
+---
+
+- name: Create Vault upstart configuration
+  template: >
+    src=vault.upstart.j2
+    dest={{ dir_config }}/vault.conf
+    owner=root
+    group=root
+    mode=0600
+  notify: 
+    - restart vault

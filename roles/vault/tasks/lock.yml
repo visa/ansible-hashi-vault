@@ -1,0 +1,20 @@
+---
+# Vault needs to be initialized only once for an active/standby configuration
+
+- set_fact:
+    init_keys_token: "{{ lookup('file', unseal_keys_location)|from_json }}"
+
+- name: Seal vault
+  uri: 
+    url: https://127.0.0.1:8200/v1/sys/seal
+    method: PUT
+    validate_certs: yes
+    headers:
+      X-Vault-Token: "{{init_keys_token['root_token']}}" 
+    status_code: 204
+  run_once: true
+
+- name: stop vault service
+  service: name=vault state=stopped
+
+

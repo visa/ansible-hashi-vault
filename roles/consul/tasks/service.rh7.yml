@@ -1,0 +1,11 @@
+---
+
+- name: Create Consul systemd configuration
+  template: >
+    src=consul.service.j2
+    dest={{ dir_config }}/consul.service
+    owner=root
+    group=root
+    mode=0600
+  notify: 
+    - restart consul

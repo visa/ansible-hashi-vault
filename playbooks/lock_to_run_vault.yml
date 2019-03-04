@@ -1,0 +1,5 @@
+- name: Run vault server
+  hosts: vault
+  become: true
+  roles:
+  - { role: vault, dispatch: ['running'], enable_firewall_rules: false }

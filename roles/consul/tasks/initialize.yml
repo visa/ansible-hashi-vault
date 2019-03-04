@@ -1,0 +1,35 @@
+---
+# create consul cluster of group members from inventory
+- name: create consul cluster
+  command: >
+   consul join {{cluster.inventory_hosts_secrets_play}}    
+  register: command_result
+  run_once: true
+
+
+## Get consul members
+- name: get members
+  command: consul members
+  register: members
+  run_once: true
+
+
+- set_fact: 
+    leaving_nodes: >
+      {%- for i in range(1, members.stdout.split('\n')|length-1) %}
+        {%- if members.stdout.split('\n')[i].split()[1].split(':')[0] not in cluster.inventory_hosts_secrets_play and members.stdout.split('\n')[i].split()[2]=='alive' -%}
+          {{ members.stdout.split('\n')[i].split()[1].split(':')[0]}},
+        {%- endif %}
+      {%- endfor %}
+
+
+- name: Remove consul nodes from cluster that are not in inventory group
+  command: consul leave
+  delegate_to: "{{item}}"
+  with_items: "{{[] if leaving_nodes is undefined or leaving_nodes|trim == '' else leaving_nodes[0:leaving_nodes|length-1].split(',')}}"
+  run_once: true
+
+#'when' does not work well 'with_*' because of a change that was reverted in ansible.
+# This is basically not allowing to define a default list when with_items does not get any prepopulated list. 
+# Ref: https://github.com/ansible/ansible/pull/9715
+

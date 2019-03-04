@@ -1,0 +1,58 @@
+---
+
+consul:
+  name: consul
+  user: consul
+  group: consul
+  version: 
+  sha256sum: 
+
+dir:
+  install: /usr/local/bin
+  data: 
+    server: /apps/consul
+    client: /usr/local/consul
+  config: consul_config
+  download: 
+
+state: "default"
+
+# Other Valid values
+#  deploy
+#  initialize
+#  provision_keys
+#  running
+#  lock
+#  wipe
+
+network_interface: "{{ ansible_default_ipv4.alias }}"
+
+cluster:
+  number_of_consul_nodes: "{{groups['secrets']|length}}"
+  inventory_hosts_secrets_play: >
+    {% for host in groups['secrets'] -%}
+      {{ host }}
+    {% endfor -%}
+
+# join nodes in inventory group
+gossip:
+  temp_key_location: /tmp/consul_gossip_key
+
+peers: >
+    {% for host in groups['consul'] %} 
+     {{ host }}:8300
+    {% endfor %}
+# populate IP addresses for peers.json file
+
+tls:
+  ca_file: root.pem
+  cert_file: consul.crt
+  key_file: consul.key
+  https_port: 8501
+
+consul_tls_key: 
+consul_tls_ca_cert: 
+consul_tls_cert: 
+  
+consul_mode_is_server: true
+troubleshoot: false

@@ -1,0 +1,16 @@
+---
+
+- set_fact: 
+   dir_config: "/etc/systemd/system"
+  when: rhel_centos_7 
+
+- set_fact:
+   dir_config: "/etc/init"
+  when: rhel_centos_6 
+ 
+- name: Vault role task dispatcher
+  include: "{{ task }}.yml" # assumes no nested includes from loops
+  with_items: "{{ dispatch|default([]) }}"
+  when: "dispatch != []"
+  loop_control: 
+    loop_var: task

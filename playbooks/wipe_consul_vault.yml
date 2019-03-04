@@ -1,0 +1,11 @@
+- name: Wipe vault server and consul client
+  hosts: vault
+  become: true
+  roles:
+  - { role: vault, dispatch: ['wipe'], enable_firewall_rules: false }
+
+- name: Wipe consul server and consul client
+  hosts: consul:vault
+  become: true
+  roles:
+  - { role: consul, dispatch: ['wipe'], enable_firewall_rules: false }

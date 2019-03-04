@@ -1,0 +1,12 @@
+---
+# handlers file for vault
+- name: restart vault
+  service: name=vault state=restarted
+
+- name: check vault status
+  command: "vault status"
+  register: status
+  failed_when: "status.stderr"
+
+- name: reload systemd
+  command: systemctl daemon-reload

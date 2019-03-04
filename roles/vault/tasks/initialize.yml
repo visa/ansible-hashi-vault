@@ -1,0 +1,31 @@
+---
+- name: Initialize vault
+  uri: 
+    url: https://127.0.0.1:8200/v1/sys/init
+    method: PUT
+    body: "{{lookup('template', '../templates/shards.json.j2')}}"
+    body_format: json
+    validate_certs: yes
+    return_content: yes
+    status_code: 200, 400
+  register: init_output
+  run_once: true
+# Vault needs to be initialized only once for an active/standby configuration
+- name: check for local unseal keys file existence
+  local_action: "stat path={{unseal_keys_location}}"
+  register: st
+  become: false 
+  run_once: true
+  when: init_output.status==200
+
+- name: Delete local unseal keys file if vault is reinitialized
+  local_action: "file path={{unseal_keys_location}} state=absent"
+  become: false 
+  when: init_output.status==200
+  run_once: true
+
+- name: keep a copy of unseal keys
+  local_action: "lineinfile dest={{unseal_keys_location}} line={{(init_output.content)|to_json}} create=yes"
+  become: false
+  run_once: true
+  when: init_output.status==200

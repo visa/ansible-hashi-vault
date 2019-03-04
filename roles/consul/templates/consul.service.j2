@@ -1,0 +1,12 @@
+[Unit]
+Description=Consul Service
+After=network.target
+
+[Service]
+Type=simple
+User=consul
+ExecStart=/usr/local/bin/consul agent -config-dir {{dir_config}}/{{dir.config}}
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target

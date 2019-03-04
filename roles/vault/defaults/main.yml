@@ -1,0 +1,60 @@
+---
+
+vault:
+  name: vault
+  version: 
+  user: vault
+  group: vault
+  sha256sum: 
+  disable_mlock: false
+  default_lease_ttl: "720h"
+  max_lease_ttl: "720h"
+  telemetry: false
+
+download_url: 
+
+dir:
+  install: /usr/local/bin
+  data: /apps/consul
+  config: consul_config
+  download: 
+
+state: default
+
+backend:
+  name: consul
+  path: "vault/"
+  address: '127.0.0.1:8501'
+  scheme: https
+  datacenter: ''
+  token: ''
+  tls_skip_verify: false
+  tls_ca_file: root_vault.pem
+  tls_cert_file: vault.crt
+  tls_key_file: vault.key
+  file_path: ''
+
+listener:
+  name: tcp
+  tcp_address: "0.0.0.0:8200"
+  tcp_tls_disable: false
+  tcp_tls_cert_file: vault.crt
+  tcp_tls_key_file: vault.key
+  tcp_tls_min_version: tls12
+  tcp_tls_cipher_suites: "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA,TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA,TLS_RSA_WITH_AES_128_GCM_SHA256,TLS_RSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_128_CBC_SHA,TLS_RSA_WITH_AES_256_CBC_SHA"
+  tcp_tls_prefer_server_cipher_suites: true 
+
+vault_tls_key: ""
+
+ui: true
+
+enterprise: false
+
+secret:
+  shares: "5"
+  threshold: "3"
+
+unseal_keys_location: '/tmp/vault/unseal_keys'
+
+backends:
+  - cert

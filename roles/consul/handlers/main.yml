@@ -1,0 +1,12 @@
+---
+# handlers file for consul
+
+- name: reload systemd
+  become: true
+  command: systemctl daemon-reload
+
+- name: restart consul
+  service: name=consul state=restarted
+
+- name: check consul status
+  command: consul info

@@ -1,0 +1,7 @@
+---
+- name: append to manifest
+  group_by: key=manifest
+
+- name: append to manifest
+  set_fact:
+    ports: "{{ ports|default([]) + firewalld_ports|default([]) }}"

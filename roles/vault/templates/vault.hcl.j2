@@ -1,0 +1,66 @@
+{% if vault.disable_mlock %}
+disable_mlock = true
+{% else %}
+disable_mlock = false
+{% endif %}
+default_lease_ttl = "{{ vault.default_lease_ttl }}"
+max_lease_ttl = "{{ vault.max_lease_ttl }}"
+
+listener "tcp" {
+  address = "{{ listener.tcp_address }}"
+{% if listener.tcp_tls_disable %}
+  tls_disable = 1
+{% endif %}
+{% if listener.tcp_tls_cert_file and not listener.tcp_tls_disable %}
+  tls_cert_file = "{{dir_config}}/{{ listener.tcp_tls_cert_file }}"
+{% endif %}
+{% if listener.tcp_tls_key_file and not listener.tcp_tls_disable %}
+  tls_key_file = "{{dir_config}}/{{ listener.tcp_tls_key_file }}"
+{% endif %}
+{% if listener.tcp_tls_min_version and not listener.tcp_tls_disable %}
+  tls_min_version = "{{ listener.tcp_tls_min_version }}"
+{% endif %}
+{% if listener.tcp_tls_cipher_suites and not listener.tcp_tls_disable %}
+  tls_cipher_suites = "{{listener.tcp_tls_cipher_suites}}"
+{% endif %}
+{% if listener.tcp_tls_prefer_server_cipher_suites and not listener.tcp_tls_disable %}
+  tls_prefer_server_cipher_suites = "true"
+{% endif %}
+
+}
+
+{% if backend.name == "consul" %}
+storage "consul" {
+  path = "{{ backend.path }}"
+{% if backend.address %}
+  address = "{{ backend.address }}"
+{% endif %}
+{% if backend.scheme %}
+  scheme = "{{ backend.scheme }}"
+{% endif %}
+{% if backend.datacenter %}
+  datacenter = "{{ backend.datacenter }}"
+{% endif %}
+{% if backend.token %}
+  token = "{{ backend.token }}"
+{% endif %}
+{% if backend.tls_skip_verify %}
+  tls_skip_verify = 1
+{% else %}
+  tls_skip_verify = 0
+{% endif %}
+{% if backend.tls_ca_file %}
+  tls_ca_file = "{{dir_config}}/{{ backend.tls_ca_file }}"
+{% endif %}
+{% if backend.tls_cert_file %}
+  tls_cert_file = "{{dir_config}}/{{ backend.tls_cert_file }}"
+{% endif %}
+{% if backend.tls_key_file %}
+  tls_key_file = "{{dir_config}}/{{ backend.tls_key_file }}"
+{% endif %}
+}
+{% endif %}
+
+ui = {{ui}}
+
+{% endif %}

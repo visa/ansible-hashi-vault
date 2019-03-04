@@ -1,0 +1,36 @@
+- name: copy consul encryption file
+  template: >
+    src=encrypt.json.j2
+    dest={{dir_config}}/{{dir.config}}/encrypt.json
+    owner={{consul.user}}
+    group={{consul.group}}
+    mode=0640
+    force=no
+  notify:
+    - restart consul
+
+- name: check for local encryption key file existence
+  local_action: "stat path={{gossip.temp_key_location}}"
+  register: st
+  become: false
+  run_once: true
+
+- name: Generate key for gossip encryption
+  shell: consul keygen
+  args:
+    executable: /bin/bash
+  register: consul_key
+  run_once: true
+  when: not st.stat.exists
+
+- name: keep a copy of encryption key
+  local_action: "lineinfile dest={{gossip.temp_key_location}} line={{consul_key.stdout}} create=yes"
+  run_once: true
+  become: false
+  when: not st.stat.exists
+
+- name: install gossip encryption key
+  replace: "dest={{dir_config}}/{{dir.config}}/encrypt.json regexp='update_after_consul_keygen' replace={{ lookup('file', gossip.temp_key_location)}} owner={{consul.user}} group={{consul.group}} mode=0600"
+
+- name: restart consul node to enable encryption 
+  meta: flush_handlers

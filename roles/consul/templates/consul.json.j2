@@ -1,0 +1,23 @@
+{
+  "server": {{ "true" if consul_mode_is_server else "false" }},
+  "bind_addr":"{{ inventory_hostname }}",
+  {% if consul_mode_is_server %}
+  "bootstrap_expect": {{groups['consul']|length}},
+  "data_dir": "{{ dir.data.server }}",
+  {% else %}
+  "data_dir": "{{ dir.data.client }}",  
+  {% endif %}
+  "ca_file": "{{dir_config}}/{{tls.ca_file}}",
+  "cert_file":"{{dir_config}}/{{tls.cert_file}}",
+  "key_file":"{{dir_config}}/{{tls.key_file}}",
+  "verify_outgoing": true,
+  "verify_incoming": true,
+  "verify_server_hostname": true,
+  {% if inventory_hostname != groups['secrets'][0] %}
+  "retry_join": ["{{ groups['secrets'][0]}}"],
+  {% endif %}
+  "ports": {
+      "http"  : -1,
+      "https" : {{tls.https_port}}
+   }
+}

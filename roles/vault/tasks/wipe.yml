@@ -1,0 +1,14 @@
+
+
+- name: Delete data files
+  command: "rm -rf {{item}}"
+  with_items:
+  - "{{dir_config}}/vault.hcl"
+  - "{{dir_config}}/ca"
+  - "{{dir_config}}/vault.crt"
+  - "{{dir_config}}/vault.key"
+  - "{{dir.install}}/vault"
+
+- name: Stop vault services
+  service: "name=vault state=stopped "
+

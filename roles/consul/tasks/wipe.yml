@@ -1,0 +1,13 @@
+- name: Delete files
+  file: "path={{item}} state=absent"
+  with_items:
+  - "{{dir.data}}"
+  - "{{dir_config}}/{{dir.config}}"
+  - "{{dir_config}}/consul.crt"
+  - "{{dir_config}}/consul.key"
+  - "{{dir_config}}/ca"
+  - "{{dir.install}}/consul"
+
+- name: Stop consul services
+  service: "name=consul state=stopped"
+

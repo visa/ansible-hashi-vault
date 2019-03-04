@@ -1,0 +1,6 @@
+
+{%if enterprise %}
+{ "secret_shares": 1, "secret_threshold":1, "stored_shares":1, "recovery_shares":{{secret.shares}}, "recovery_threshold":{{secret.threshold}}}
+{% else %}
+{"secret_shares":{{secret.shares}}, "secret_threshold":{{secret.threshold}}}
+{% endif %}

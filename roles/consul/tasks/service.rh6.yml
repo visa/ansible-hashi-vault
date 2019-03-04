@@ -1,0 +1,12 @@
+---
+
+- name: Create Consul upstart configuration
+  template: >
+    src=consul.upstart.j2
+    dest={{ dir_config }}/consul.conf
+    owner=root
+    group=root
+    mode=0600
+  notify: 
+    - restart consul
+#    - check consul status

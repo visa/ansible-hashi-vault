@@ -1,0 +1,21 @@
+description "vault service"
+
+start on filesystem or runlevel [2345]
+stop on shutdown
+
+script
+
+    #export HOME="/srv"
+    echo $$ > /var/run/vault.pid
+    exec {{dir.install}}/vault server -config={{dir_config}}/vault.hcl
+
+end script
+
+pre-start script
+    echo "[`date`] vault service Starting" >> /var/log/vault.log
+end script
+
+pre-stop script
+    rm /var/run/vault.pid
+    echo "[`date`] vault service Stopping" >> /var/log/vault.log
+end script

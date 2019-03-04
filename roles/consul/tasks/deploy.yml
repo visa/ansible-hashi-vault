@@ -1,0 +1,82 @@
+---
+- set_fact:
+    arch: linux_amd64
+  when: ansible_system == "Linux"
+
+- set_fact:
+    arch: darwin_amd64
+  when: ansible_system == "Darwin"
+
+- name: Create consul group
+  group: >
+    name={{consul.group}} system=yes state=present
+
+- name: Create consul specific user
+  user: >
+    name={{consul.user}} group={{consul.group}} system=yes
+    home=/var/lib/consul shell=/bin/false
+    state=present
+
+- name: Ensures consul config directory exists
+  file: path={{dir_config}}/{{dir.config}} owner={{consul.user}} group={{consul.group}} state=directory
+
+- name: Ensures consul data directory exists
+  file: path={{dir.data.client}} state=directory owner={{consul.user}} group={{consul.group}} mode=0700 recurse=yes
+  when: consul_mode_is_server == false
+
+- name: install unzip from yum
+  yum:
+    name: unzip
+    state: latest
+  when: rhel_centos_7
+
+- name: Unpacks Consul to location
+  unarchive: >
+    src={{ dir.download }}/consul_{{ consul.version }}_{{ arch }}.zip
+    dest={{ dir.install }}
+    remote_src=False
+    owner={{ consul.user }}
+    group={{ consul.group }}
+    validate_certs=yes
+    mode=0750
+  notify: 
+    - restart consul
+
+- name: copy certificate to config directory
+  copy: content={{consul_tls_cert}} dest={{dir_config}}/consul.crt owner={{consul.user}} group={{consul.group}} mode=0600
+
+- name: copy key file to config directory
+  copy: content={{consul_tls_key}} dest={{dir_config}}/consul.key owner={{consul.user}} group={{consul.group}} mode=0600
+
+- name: copy ca cert file to config directory
+  copy: content={{consul_tls_ca_cert}} dest={{dir_config}}/root.pem owner={{consul.user}} group={{consul.group}} mode=0600
+
+- name: Consul configuration file
+  template: >
+    src=consul.json.j2
+    dest={{ dir_config }}/{{dir.config}}/consul.json
+    owner={{ consul.user }}
+    group={{ consul.group }}
+    mode=0600
+  notify: 
+    - restart consul
+
+- include: service.rh6.yml
+  when: rhel_centos_6
+
+- include: service.rh7.yml
+  when: rhel_centos_7
+
+- name: change ownership to consul
+  file: >
+    path={{dir.data.server}}
+    owner={{consul.user}}
+    group={{consul.group}}
+    mode=0700
+    recurse=yes
+  when: consul_mode_is_server
+
+- include: gossip_encryption.yml
+
+- name: Ensure Consul service is started and enabled at boot
+  service: name=consul state=started enabled=yes

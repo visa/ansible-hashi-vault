@@ -1,0 +1,14 @@
+---
+
+- name: Create Vault systemd configuration
+  template: >
+    src=vault.service.j2
+    dest={{ dir_config }}/vault.service
+    owner=root
+    group=root
+    mode=0600
+  notify:
+    - reload systemd
+    - restart vault
+
+- meta: flush_handlers

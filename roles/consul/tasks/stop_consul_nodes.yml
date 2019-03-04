@@ -1,0 +1,3 @@
+#Stop consul nodes 
+- name: stop consul
+  service: name=consul state=stopped sleep=5

@@ -1,0 +1,4 @@
+---
+dependencies: 
+- {role: common,
+  firewalld_ports: ["8200-8201/tcp"]} 

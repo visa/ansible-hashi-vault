@@ -1,0 +1,5 @@
+- name: Lock vault server
+  hosts: vault
+  become: true
+  roles:
+  - { role: vault, dispatch: ['lock'], enable_firewall_rules: false }

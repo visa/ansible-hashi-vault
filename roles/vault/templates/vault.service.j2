@@ -1,0 +1,13 @@
+[Unit]
+Description=Vault Service
+After=network.target
+
+[Service]
+Type=simple
+User=vault
+ExecStart={{ dir.install }}/vault server -config={{ dir_config }}/vault.hcl
+Restart=on-abort
+
+
+[Install]
+WantedBy=multi-user.target

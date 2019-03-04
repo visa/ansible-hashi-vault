@@ -1,0 +1,24 @@
+- name: Deploy consul server
+  hosts: vault
+  roles:
+  - { role: consul, dispatch: ['deploy'] }
+
+- name: Deploy vault server
+  hosts: vault
+  roles:
+  - { role: vault, dispatch: ['deploy'] }
+
+- name: Initialize consul server
+  hosts: vault
+  roles:
+  - { role: consul, dispatch: ['initialize'] }
+
+- name: Initialize vault server
+  hosts: vault
+  roles:
+  - { role: vault, dispatch: ['initialize'] }
+
+- name: Run vault server
+  hosts: vault
+  roles:
+  - { role: vault, dispatch: ['running'] }
